@@ -83,9 +83,9 @@ int main(int argc, char **argv){
 
                 //while ((read = fread(packet, 1, 996, file)) > 0) {
                     read = fread(packet, 1, 996, file);
-                    //packet = memcpy(&packet, &pacNum, sizeof(int));
+                    //packet = memcpy(&packet[0], &pacNum, 4);
                     int ssent = sendto(sockfd, packet, read, 0, (struct sockaddr*)&clientaddr, sizeof(clientaddr));
-                    printf("Sending, size is %d\n     Bytes read: %zd", ssent, read);
+                    printf("Sending, size is %d\n     Bytes read: %zd\n", ssent, read);
                 //}
 			}
     		else{
