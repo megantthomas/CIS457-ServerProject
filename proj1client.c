@@ -8,7 +8,7 @@
 
 /**
  * @Author Megan Thomas & Cody Krueger 
- * @Date 24 SEP 2018
+ * @Date 25 SEP 2018
  * CIS 457 Data Comm
  * PRJ 1-A UDP Echo Client with Sliding Window
  * 
@@ -21,30 +21,28 @@ int main(int argc, char **argv){
     //Create Socket
 	int sockfd = socket(AF_INET,SOCK_DGRAM,0);
 	if (sockfd<0){
-		printf("There was an ERROR(1) creating the socket\n"); //**does a n\ cause a problem here?
+		printf("There was an ERROR(1) creating the socket");
 		return 1; 
 	}
 
     //Port Num
+	char sPort[100];
 	printf("Port Number: ");
-	// char sPort[5000];
-	// fgets(sPort, 5000, stdin);
-	// int portNum = atoi (sPort);
-    //for testing --------------- **
-    int portNum = 9874;
-    printf("9874 \n");
+	fgets(sPort, 100, stdin);
+	int portNum = atoi (sPort);
     if(portNum < 1023 || portNum > 49152){
 		printf("Try again with valid port number\n");
 		return 0; 
 	}
 
     //IP Address
+    char addr[100];
 	printf("IP Address: ");
-	//char addr[5000];
-	// fgets(addr, 5000, stdin);
-    //for testing --------------- **
-    char addr[] = "127.0.0.1";
-     printf("%s \n", addr);
+	fgets(addr, 100, stdin);
+    char *pos;
+	if ((pos=strchr(addr, '\n')) != NULL){
+    	*pos = '\0';
+ 	}
     if(!(isValidIpAddress(addr))){
     	printf("Try again with a valid IP address\n");
     	return 0;
@@ -60,9 +58,8 @@ int main(int argc, char **argv){
     //File Request
     unsigned int len = sizeof(serveraddr);
 	printf("File: ");
-	char fName[1000];
-	fgets(fName, 1000, stdin);
-	char *pos;
+	char fName[100];
+	fgets(fName, 100, stdin);
 	if ((pos=strchr(fName, '\n')) != NULL){
     	*pos = '\0';
     }
@@ -70,8 +67,8 @@ int main(int argc, char **argv){
 	
     //New File Creation
 	printf("New file name: ");
-	char newFName[1000];
-	fgets(newFName, 1000, stdin);
+	char newFName[100];
+	fgets(newFName, 100, stdin);
 	if ((pos=strchr(newFName, '\n')) != NULL){
     	*pos = '\0';
     }
@@ -86,40 +83,16 @@ int main(int argc, char **argv){
     //Recieving Data
 	int numBytes;
     char* fContents;
-    fContents = (char*)malloc(1024*sizeof(char));
+    fContents = (char*)malloc(1025*sizeof(char));
 	int count = 0;
-	   // //Sliding Window-------------------------------------------------
-
-    // //Window 
-    // char min_c = '0';
-    // char max_c = '4';
-
-    // int MIN = 0;
-    // int MAX = 4;
-
-    // while (min_c < packetNum < max_c) {
-    //     //recieve packets TODO
-
-    //     if (packetNum == min_c) {
-    //         //send ack TODO
-
-    //         //adjust window bounds
-    //         MIN++;
-    //         MAX++;
-            
-    //         min_c = (MIN%10) + 48;
-    //         max_c = (MAX%10) + 48;
-    //     }
-    //     //for v2
-    //     //if duplicate packet (ie below min) 
-    //     //discard packet and resend ack for recieved packet
-    // }
-    // ------------------------------------------------------------
-
 	while (1) {
 		numBytes = recvfrom(sockfd, fContents, 1024+1, 0,(struct sockaddr*)&serveraddr, &len);
 		char packetNum = fContents[0];
 		int pNum = packetNum - 48;
+		if(totalPackets == pNum){
+			close(sockfd);
+			return 1;
+		}
 		printf("Packet number %c of %d recieved\n", packetNum, totalPackets);
 		printf("%s\n", fContents);
 		if(packetNum == '0'){
@@ -133,10 +106,6 @@ int main(int argc, char **argv){
 			fwrite(fContents+1, 1, numBytes-1, newFile);
 			fclose(newFile);
 			sendto(sockfd, fContents, 1, 0, (struct sockaddr*)&serveraddr, len);
-		}
-		if(totalPackets == pNum){
-			close(sockfd);
-			return 1;
 		}
 	}
 }
