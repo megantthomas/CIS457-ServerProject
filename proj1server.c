@@ -115,3 +115,38 @@ int main(int argc, char **argv){
 		}
 	}
 }
+
+    //Sliding Window-------------------------------------------------
+
+    //Window 
+    char min_c = '0';
+    char max_c = '4';
+
+    int MIN = 0;
+    int MAX = 4;
+
+    char[10] ackarr;
+    int i = 0;
+
+    while (min_c < packetNum < max_c) {
+        //send packets TODO
+        //recieve acks TODO
+        //concatinate into array?
+        //progress through array looking at acks
+        //do we need a loof around iff to do that? or will constand send and recv take care of that?
+        //or would they halt the progress of this?
+        if (ackArr[i] == min_c) {
+            //adjust window bounds
+            MIN++;
+            MAX++;
+            
+            min_c = (MIN%10) + 48;
+            max_c = (MAX%10) + 48;
+
+            i++;
+        }
+        //for v2
+        //wait x seconds
+        //if no ack, resend min 
+    }
+    //------------------------------------------------------------
