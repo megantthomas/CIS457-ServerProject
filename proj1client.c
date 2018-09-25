@@ -40,11 +40,12 @@ int main(int argc, char **argv){
 	// fgets(addr, 1000, stdin);
     //for testing --------------- **
     char addr[] = "127.0.0.1";
-    printf("%s \n", addr);
+     printf("%s \n", addr);
     if(!(isValidIpAddress(addr))){
     	printf("Try again with a valid IP address\n");
     	return 0;
     }
+
 
     //Socket Struct 
 	struct sockaddr_in serveraddr;
@@ -71,22 +72,23 @@ int main(int argc, char **argv){
     	*pos = '\0';
     }
 	FILE* newFile;
-	newFile = fopen(newFName, "wb");
 
     //Recieving Data
-
 	int numBytes;
 	char fContents[10];
+	int count = 0;
 	while (0 < (numBytes = recvfrom(sockfd, fContents, 10, 0,(struct sockaddr*)&serveraddr, &len))) {
 		printf("%s\n", fContents );
+		printf("%d\n", count );
+		count++;
+		newFile = fopen(newFName, "a");
 		//fputs(fContents, newFile);
-		//fwrite(fContents, 1, numBytes+1, newFile);
+		fwrite(fContents, 1, numBytes+1, newFile);
+		fclose(newFile);
 	}
-	fclose(newFile);
 
 	close(sockfd);
 }
-
 
 //method to check if a string is an valid ip address 
 //source: https://stackoverflow.com/questions/791982/determine-if-a-string-is-a-valid-ipv4-address-in-c
