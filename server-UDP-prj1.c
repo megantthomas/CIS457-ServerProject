@@ -74,19 +74,29 @@ int main(int argc, char **argv){
   				// sendto(sockfd, buffer, strlen(buffer)+1, 0, (struct sockaddr*)&clientaddr, sizeof(clientaddr));                
                 // fclose (file);
 
-                char packet[1000];
-                int pacNum = 1;
-                ssize_t read;
-                // file exists
-                printf("File found.\n");
-                file = fopen(fileName, "r");
+                	// char packet[1000];
+			char* packet;
+			packet = (char*)malloc(10*sizeof(char));
+			char pacNum = '0';
+			ssize_t read;
+			// file exists
+			printf("File found.\n");
+			file = fopen(fileName, "rb");
 
-                //while ((read = fread(packet, 1, 996, file)) > 0) {
-                    read = fread(packet, 1, 996, file);
-                    //packet = memcpy(&packet[0], &pacNum, 4);
-                    int ssent = sendto(sockfd, packet, read, 0, (struct sockaddr*)&clientaddr, sizeof(clientaddr));
-                    printf("Sending, size is %d\n     Bytes read: %zd\n", ssent, read);
-                //}
+			while ((read = fread(packet+1, 1, 10, file)) > 0) {
+				*packet = pacNum;
+                    		//read = fread(packet+1, 1, 996, file);
+                    		//memcpy(&packet[0], &pacNum, 4);
+                    		int ssent = sendto(sockfd, packet, read, 0, (struct sockaddr*)&clientaddr, sizeof(clientaddr));
+                    		printf("Sending, size is %d\n     Bytes read: %zd\n", ssent, read);
+					printf("Contents: %s", packet); //testing **
+					
+					pacNum+=1;
+					free(packet);
+					char* packet;
+					packet = (char*)malloc(10*sizeof(char));
+				}
+				free(packet);
 			}
     		else{
                 //File Does Not Exist
