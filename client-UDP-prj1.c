@@ -70,7 +70,6 @@ int main(int argc, char **argv){
 	char fContents[10];
 	while (0 < (numBytes = recvfrom(sockfd, fContents, 10, 0,(struct sockaddr*)&serveraddr, &len))) {
 		printf("%s\n", fContents );
-		fprintf()
 		//fputs(fContents, newFile);
 		//fwrite(fContents, 1, numBytes+1, newFile);
 	}
