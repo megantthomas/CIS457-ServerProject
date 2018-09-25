@@ -4,6 +4,7 @@
 #include <stdio.h>
 #include <string.h>
 #include <unistd.h>
+#include <stdlib.h>
 
 /**
  * @Author Megan Thomas & Cody Krueger 
@@ -12,6 +13,8 @@
  * PRJ 1-A UDP Echo Client with Sliding Window
  * 
  **/
+
+int isValidIpAddress(char *ipAddress);
 
 int main(int argc, char **argv){
     //Create Socket
@@ -29,14 +32,23 @@ int main(int argc, char **argv){
     //for testing --------------- **
     int portNum = 9874;
     printf("9874 \n");
+    if(portNum < 1023 || portNum > 49152){
+		printf("Try again with valid port number\n");
+		return 0; 
+	}
 
     //IP Address
 	printf("IP Address: ");
 	//char addr[1000];
 	// fgets(addr, 1000, stdin);
     //for testing --------------- **
-    char addr[] = "127.0.0.1 \n";
-    printf("%s", addr);
+    char addr[] = "127.0.0.1";
+     printf("%s \n", addr);
+    if(!(isValidIpAddress(addr))){
+    	printf("Try again with a valid IP address\n");
+    	return 0;
+    }
+
 
     //Socket Struct 
 	struct sockaddr_in serveraddr;
@@ -63,17 +75,41 @@ int main(int argc, char **argv){
     	*pos = '\0';
     }
 	FILE* newFile;
-	newFile = fopen(newFName, "w+");
+    newFile = fopen(newFName, "w+");
+    // fclose(newFile);
 
     //Recieving Data
+    int packetSize = 1001;
 	int numBytes;
-	char fContents[10];
-	while (0 < (numBytes = recvfrom(sockfd, fContents, 10, 0,(struct sockaddr*)&serveraddr, &len))) {
-		printf("%s\n", fContents );
+	//char fContents[10];
+    char* fContents;
+    char ident = 'a';
+    fContents = (char*)malloc(packetSize*sizeof(char));
+	int count = 0;
+	while (0 < (numBytes = recvfrom(sockfd, fContents, packetSize+1, 0,(struct sockaddr*)&serveraddr, &len))) {
+		//printf("%s\n", fContents );
+		newFile = fopen(newFName, "a");
 		//fputs(fContents, newFile);
-		//fwrite(fContents, 1, numBytes+1, newFile);
-	}
-	fclose(newFile);
+		fwrite(fContents+1, 1, numBytes-1, newFile);
+		fclose(newFile);
 
+        // ident = fContents[0];
+        // printf("%c", ident);
+        // //reply for packet recieved
+        // sendto(sockfd, ident, 1, 0,(struct sockaddr*)&serveraddr, len);
+        free(fContents);
+        char* fContents;
+        fContents = (char*)malloc(packetSize*sizeof(char));
+	}
+    free(fContents);
 	close(sockfd);
+}
+
+//method to check if a string is an valid ip address 
+//source: https://stackoverflow.com/questions/791982/determine-if-a-string-is-a-valid-ipv4-address-in-c
+int isValidIpAddress(char *ipAddress)
+{
+    struct sockaddr_in sa;
+    int result = inet_pton(AF_INET, ipAddress, &(sa.sin_addr));
+    return result != 0;
 }
