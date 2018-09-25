@@ -4,6 +4,7 @@
 #include <stdio.h>
 #include <string.h>
 #include <unistd.h>
+#include <stdlib.h>
 
 /**
  * @Author Megan Thomas & Cody Krueger 
@@ -72,17 +73,20 @@ int main(int argc, char **argv){
     	*pos = '\0';
     }
 	FILE* newFile;
-
+    // newFile = fopen(newFName, "w+");
+    // fclose(newFile);
 
     //Recieving Data
 	int numBytes;
-	char fContents[10];
+	//char fContents[10];
+    char* fContents;
+    fContents = (char*)malloc(10*sizeof(char));
 	int count = 0;
-	while (0 < (numBytes = recvfrom(sockfd, fContents, 10, 0,(struct sockaddr*)&serveraddr, &len))) {
+	while (0 < (numBytes = recvfrom(sockfd, fContents, 10+1, 0,(struct sockaddr*)&serveraddr, &len))) {
 		printf("%s\n", fContents );
 		newFile = fopen(newFName, "a");
 		//fputs(fContents, newFile);
-		fwrite(fContents, 1, numBytes+1, newFile);
+		fwrite(fContents+1, 1, numBytes-1, newFile);
 		fclose(newFile);
 	}
 
