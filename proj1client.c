@@ -85,15 +85,12 @@ int main(int argc, char **argv){
     char* fContents;
     fContents = (char*)malloc(1025*sizeof(char));
 	int count = 0;
+	ssize_t read;
 	while (1) {
 		numBytes = recvfrom(sockfd, fContents, 1024+1, 0,(struct sockaddr*)&serveraddr, &len);
 		char packetNum = fContents[0];
 		int pNum = packetNum - 48;
 		//printf("%s\n", fContents);
-		if(totalPackets+1 == pNum+1){
-			close(sockfd);
-			return 1;
-		}
 
 		printf("Packet number %c of %d recieved\n", packetNum, totalPackets);
 		("%s\n", fContents);
@@ -108,6 +105,12 @@ int main(int argc, char **argv){
 			fwrite(fContents+1, 1, numBytes-1, newFile);
 			fclose(newFile);
 			sendto(sockfd, fContents, 1, 0, (struct sockaddr*)&serveraddr, len);
+		}
+
+		if(totalPackets+1 == pNum+1 ){
+			printf("Trasmision done\n");
+			close(sockfd);
+			return 1;
 		}
 	}
 }
