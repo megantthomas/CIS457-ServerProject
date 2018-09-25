@@ -68,17 +68,8 @@ int main(int argc, char **argv){
 			long length;
             // from https://stackoverflow.com/questions/230062/whats-the-best-way-to-check-if-a-file-exists-in-c-cross-platform
     		if (access( fileName, F_OK ) != -1){
-                //File Exists
-                // file = fopen(fileName, "r");
-    			// fseek (file, 0, SEEK_END);
-				// length = ftell (file);
-  				// fseek (file, 0, SEEK_SET);
-  				// buffer = malloc (length*sizeof(char));
-  				// fread (buffer, 1, length, file);
-  				// sendto(sockfd, buffer, strlen(buffer)+1, 0, (struct sockaddr*)&clientaddr, sizeof(clientaddr));                
-                // fclose (file);
-
-                	// char packet[1000];
+            
+			//
 			char* packet;
 			packet = (char*)malloc(10*sizeof(char));
 			char pacNum = '0';
@@ -87,14 +78,27 @@ int main(int argc, char **argv){
 			printf("File found.\n");
 			file = fopen(fileName, "rb");
 
+			//Calculate and send the number of packets
+            fseek(file, 0L, SEEK_END);
+			int sz = ftell(file);
+			fseek(file, 0L, SEEK_SET);
+			sz = (sz/10);
+			char tots[10];
+			snprintf(tots, sizeof(tots), "%d", sz);
+			int pNum = sendto(sockfd, tots, strlen(tots)+1, 0, (struct sockaddr*)&clientaddr, sizeof(clientaddr));
+			printf("%s\n", tots );
+
 			while ((read = fread(packet+1, 1, 10, file)) > 0) {
 				*packet = pacNum;
                     		//read = fread(packet+1, 1, 996, file);
                     		//memcpy(&packet[0], &pacNum, 4);
                     		int ssent = sendto(sockfd, packet, read+1, 0, (struct sockaddr*)&clientaddr, sizeof(clientaddr));
                     		printf("Sending, size is %d\n     Bytes read: %zd\n", ssent, read);
-					printf("Contents: %s\n", packet); //testing **
-					
+							printf("Contents: %s\n", packet); //testing **
+							// char ack[10];
+							// recvfrom(sockfd, ack, strlen(ack) +1, 0, (struct sockaddr*)&clientaddr, &len);
+							// printf("%s\n", ack);
+							
 					pacNum+=1;
 					free(packet);
 					char* packet;
