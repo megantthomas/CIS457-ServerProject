@@ -14,6 +14,9 @@
  * 
  **/
 
+//Function Declarations
+int isValidIpAddress(char *ipAddress);
+
 int main(int argc, char **argv){
     //Create Socket
 	int sockfd = socket(AF_INET,SOCK_DGRAM,0);
@@ -116,3 +119,31 @@ int isValidIpAddress(char *ipAddress)
     int result = inet_pton(AF_INET, ipAddress, &(sa.sin_addr));
     return result != 0;
 }
+
+    //Sliding Window-------------------------------------------------
+
+    //Window 
+    char min_c = '0';
+    char max_c = '4';
+
+    int MIN = 0;
+    int MAX = 4;
+
+    while (min_c < packetNum < max_c) {
+        //recieve packets TODO
+
+        if (packetNum == min_c) {
+            //send ack TODO
+
+            //adjust window bounds
+            MIN++;
+            MAX++;
+            
+            min_c = (MIN%10) + 48;
+            max_c = (MAX%10) + 48;
+        }
+        //for v2
+        //if duplicate packet (ie below min) 
+        //discard packet and resend ack for recieved packet
+    }
+    //------------------------------------------------------------
