@@ -73,14 +73,13 @@ int main(int argc, char **argv){
     }
 	FILE* newFile;
 
+
     //Recieving Data
 	int numBytes;
 	char fContents[10];
 	int count = 0;
 	while (0 < (numBytes = recvfrom(sockfd, fContents, 10, 0,(struct sockaddr*)&serveraddr, &len))) {
 		printf("%s\n", fContents );
-		printf("%d\n", count );
-		count++;
 		newFile = fopen(newFName, "a");
 		//fputs(fContents, newFile);
 		fwrite(fContents, 1, numBytes+1, newFile);
