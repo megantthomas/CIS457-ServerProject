@@ -94,7 +94,7 @@ int main(int argc, char **argv){
 			return 1;
 		}
 		printf("Packet number %c of %d recieved\n", packetNum, totalPackets);
-		printf("%s\n", fContents);
+		//for testing printf("%s\n", fContents);
 		if(packetNum == '0'){
 			newFile = fopen(newFName, "w+");
 			fwrite(fContents+1, 1, numBytes-1, newFile);
