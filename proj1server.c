@@ -97,15 +97,16 @@ int main(int argc, char **argv){
 					if(currentP>=min && currentP<=max){
 						*packet = pacNum;
                			int ssent = sendto(sockfd, packet, read+1, 0, (struct sockaddr*)&clientaddr, sizeof(clientaddr));
-               			printf("Sending, size is %d\n     Bytes read: %zd\n", ssent, read);
+               			printf("Sending packet %d\nSize: %d\nBytes read: %zd\n", currentP, ssent, read);
 						//printf("Contents: %s\n", packet); //testing **
+						printf("\n");
 						
 						//if we recieve an ack we move the window 
 						//if no acks are recieved then the program will not send more than 5 packets
 						//and will be stuck waiting for other packets for now. Will fix this in 
 						//part two by resending lost packets 
 						if(recvfrom(sockfd, ack, HEADER, 0, (struct sockaddr*)&clientaddr, &len)){
-							printf("ack num %d recieved\n", numAcks);
+							//testing printf("ack num %d recieved\n", numAcks);
 							numAcks++;
 					 		if(!(max >= sz)){
 					 			max++;
