@@ -91,9 +91,9 @@ int main(int argc, char **argv){
 				*packet = pacNum;
                     		//read = fread(packet+1, 1, 996, file);
                     		//memcpy(&packet[0], &pacNum, 4);
-                    		int ssent = sendto(sockfd, packet, read, 0, (struct sockaddr*)&clientaddr, sizeof(clientaddr));
+                    		int ssent = sendto(sockfd, packet, read+1, 0, (struct sockaddr*)&clientaddr, sizeof(clientaddr));
                     		printf("Sending, size is %d\n     Bytes read: %zd\n", ssent, read);
-					printf("Contents: %s", packet); //testing **
+					printf("Contents: %s\n", packet); //testing **
 					
 					pacNum+=1;
 					free(packet);
