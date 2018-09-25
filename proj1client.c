@@ -89,12 +89,14 @@ int main(int argc, char **argv){
 		numBytes = recvfrom(sockfd, fContents, 1024+1, 0,(struct sockaddr*)&serveraddr, &len);
 		char packetNum = fContents[0];
 		int pNum = packetNum - 48;
-		if(totalPackets == pNum){
+		//printf("%s\n", fContents);
+		if(totalPackets+1 == pNum+1){
 			close(sockfd);
 			return 1;
 		}
+
 		printf("Packet number %c of %d recieved\n", packetNum, totalPackets);
-		//for testing printf("%s\n", fContents);
+		("%s\n", fContents);
 		if(packetNum == '0'){
 			newFile = fopen(newFName, "w+");
 			fwrite(fContents+1, 1, numBytes-1, newFile);
