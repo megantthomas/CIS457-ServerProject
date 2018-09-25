@@ -66,10 +66,15 @@ int main(int argc, char **argv){
 	newFile = fopen(newFName, "w+");
 
     //Recieving Data
-	char fContents[1000];
-	int n = recvfrom(sockfd,fContents,1000,0,(struct sockaddr*)&serveraddr, &len);	
-	printf("%s\n", fContents );
-	fputs(fContents, newFile);
+	int numBytes;
+	char fContents[10];
+	while (0 < (numBytes = recvfrom(sockfd, fContents, 10, 0,(struct sockaddr*)&serveraddr, &len))) {
+		printf("%s\n", fContents );
+		fprintf()
+		//fputs(fContents, newFile);
+		//fwrite(fContents, 1, numBytes+1, newFile);
+	}
+	fclose(newFile);
 
 	close(sockfd);
 }
