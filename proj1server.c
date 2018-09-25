@@ -43,7 +43,7 @@ int main(int argc, char **argv){
 
     //Socket Struct 
     struct sockaddr_in serveraddr, clientaddr;
-	serveraddr.sin_family = AF_INET; //serveraddr.sin_family+ AF_INET; **Was there a reason this was "+" instead of "="?
+	serveraddr.sin_family = AF_INET; 
 	serveraddr.sin_port = htons(portNum);
 	serveraddr.sin_addr.s_addr = INADDR_ANY;
 		
@@ -71,9 +71,10 @@ int main(int argc, char **argv){
             
 			//
 			char* packet;
-			packet = (char*)malloc(10*sizeof(char));
+			packet = (char*)malloc(PACKET*sizeof(char));
 			char pacNum = '0';
 			ssize_t read;
+
 			// file exists
 			printf("File found.\n");
 			file = fopen(fileName, "rb");
@@ -82,27 +83,58 @@ int main(int argc, char **argv){
             fseek(file, 0L, SEEK_END);
 			int sz = ftell(file);
 			fseek(file, 0L, SEEK_SET);
-			sz = (sz/10);
+			sz = (sz/PACKET);
 			char tots[10];
 			snprintf(tots, sizeof(tots), "%d", sz);
 			int pNum = sendto(sockfd, tots, strlen(tots)+1, 0, (struct sockaddr*)&clientaddr, sizeof(clientaddr));
 			printf("%s\n", tots );
 
-			while ((read = fread(packet+1, 1, 10, file)) > 0) {
+    //Sliding Window-------------------------------------------------
+
+    // Window 
+    // char min_c = '0';
+    // char max_c = '4';
+
+    // int MIN = 0;
+    // int MAX = 4;
+
+    // char[10] ackarr;
+    // int i = 0;
+
+    // while (min_c < packetNum < max_c) {
+    //     //send packets TODO
+    //     //recieve acks TODO
+    //     //concatinate into array?
+    //     //progress through array looking at acks
+    //     //do we need a loof around iff to do that? or will constand send and recv take care of that?
+    //     //or would they halt the progress of this?
+    //     if (ackArr[i] == min_c) {
+    //         //adjust window bounds
+    //         MIN++;
+    //         MAX++;
+            
+    //         min_c = (MIN%10) + 48;
+    //         max_c = (MAX%10) + 48;
+
+    //         i++;
+    //     }
+    //     //for v2
+    //     //wait x seconds
+    //     //if no ack, resend min 
+    
+    // //------------------------------------------------------------
+
+			while ((read = fread(packet+1, 1, PACKET, file)) > 0) {
 				*packet = pacNum;
-                    		//read = fread(packet+1, 1, 996, file);
-                    		//memcpy(&packet[0], &pacNum, 4);
                     		int ssent = sendto(sockfd, packet, read+1, 0, (struct sockaddr*)&clientaddr, sizeof(clientaddr));
                     		printf("Sending, size is %d\n     Bytes read: %zd\n", ssent, read);
 							printf("Contents: %s\n", packet); //testing **
-							// char ack[10];
-							// recvfrom(sockfd, ack, strlen(ack) +1, 0, (struct sockaddr*)&clientaddr, &len);
-							// printf("%s\n", ack);
+							
 							
 					pacNum+=1;
 					free(packet);
 					char* packet;
-					packet = (char*)malloc(10*sizeof(char));
+					packet = (char*)malloc(PACKET*sizeof(char));
 				}
 				free(packet);
 			}
@@ -115,38 +147,3 @@ int main(int argc, char **argv){
 		}
 	}
 }
-
-    //Sliding Window-------------------------------------------------
-
-    //Window 
-    char min_c = '0';
-    char max_c = '4';
-
-    int MIN = 0;
-    int MAX = 4;
-
-    char[10] ackarr;
-    int i = 0;
-
-    while (min_c < packetNum < max_c) {
-        //send packets TODO
-        //recieve acks TODO
-        //concatinate into array?
-        //progress through array looking at acks
-        //do we need a loof around iff to do that? or will constand send and recv take care of that?
-        //or would they halt the progress of this?
-        if (ackArr[i] == min_c) {
-            //adjust window bounds
-            MIN++;
-            MAX++;
-            
-            min_c = (MIN%10) + 48;
-            max_c = (MAX%10) + 48;
-
-            i++;
-        }
-        //for v2
-        //wait x seconds
-        //if no ack, resend min 
-    }
-    //------------------------------------------------------------
