@@ -32,12 +32,12 @@ int main(int argc, char **argv){
 	timeout.tv_usec = 0;
     setsockopt(sockfd,SOL_SOCKET,SO_RCVTIMEO, &timeout, sizeof(timeout));
 
-    //Get and check PortNum
+    //Get PortNum
 	printf("Port number: ");
 	int portNum; 
 	scanf("%d", &portNum);
 	if(portNum < 1023 || portNum > 49152){
-		printf("Try again with valid port number");
+		printf("Try again with valid port number\n");
 		return 0; 
 	}
 
@@ -78,18 +78,7 @@ int main(int argc, char **argv){
   				// sendto(sockfd, buffer, strlen(buffer)+1, 0, (struct sockaddr*)&clientaddr, sizeof(clientaddr));                
                 // fclose (file);
 
-			//module v2
-// 			char packet[1000];
-// 			int pacNum = 1;
-// 			ssize_t read;
-// 			// file exists
-// 			printf("File found.\n");
-// 			file = fopen(fileName, "rb");
-// 			read = fread(packet, 1, 996, file);
-// 			int ssent = sendto(sockfd, packet, read, 0, (struct sockaddr*)&clientaddr, sizeof(clientaddr));
-// 			printf("Sending, size is %d\n     Bytes read: %zd", ssent, read);
-			
-			//module v3
+                	// char packet[1000];
 			char* packet;
 			packet = (char*)malloc(10*sizeof(char));
 			char pacNum = '0';
@@ -100,17 +89,19 @@ int main(int argc, char **argv){
 
 			while ((read = fread(packet+1, 1, 10, file)) > 0) {
 				*packet = pacNum;
-			    	int ssent = sendto(sockfd, packet, read, 0, (struct sockaddr*)&clientaddr, sizeof(clientaddr));
-			    	printf("Sending, size is %d\n     Bytes read: %zd\n", ssent, read);
-				printf("Contents: %s", packet); //testing **
-				pacNum+=1;
+                    		//read = fread(packet+1, 1, 996, file);
+                    		//memcpy(&packet[0], &pacNum, 4);
+                    		int ssent = sendto(sockfd, packet, read, 0, (struct sockaddr*)&clientaddr, sizeof(clientaddr));
+                    		printf("Sending, size is %d\n     Bytes read: %zd\n", ssent, read);
+					printf("Contents: %s", packet); //testing **
+					
+					pacNum+=1;
+					free(packet);
+					char* packet;
+					packet = (char*)malloc(10*sizeof(char));
+				}
 				free(packet);
-				char* packet;
-				packet = (char*)malloc(10*sizeof(char));
 			}
-			free(packet);
-			
-		}
     		else{
                 //File Does Not Exist
     			char err[] = "File does not exist \n";
