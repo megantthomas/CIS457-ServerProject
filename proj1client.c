@@ -73,24 +73,39 @@ int main(int argc, char **argv){
     	*pos = '\0';
     }
 	FILE* newFile;
-    // newFile = fopen(newFName, "w+");
-    // fclose(newFile);
+	char* total;
+    recvfrom(sockfd, total, 1, 0,(struct sockaddr*)&serveraddr, &len);
+    int totalPackets = atoi(total);
+
 
     //Recieving Data
 	int numBytes;
-	//char fContents[10];
     char* fContents;
     fContents = (char*)malloc(10*sizeof(char));
 	int count = 0;
-	while (0 < (numBytes = recvfrom(sockfd, fContents, 10+1, 0,(struct sockaddr*)&serveraddr, &len))) {
-		printf("%s\n", fContents );
-		newFile = fopen(newFName, "a");
-		//fputs(fContents, newFile);
-		fwrite(fContents+1, 1, numBytes-1, newFile);
-		fclose(newFile);
+	while (1) {
+		numBytes = recvfrom(sockfd, fContents, 10+1, 0,(struct sockaddr*)&serveraddr, &len);
+		char packetNum = fContents[0];
+		int pNum = packetNum - 48;
+		printf("Packet number %c recieved\n", packetNum);
+		printf("%s\n", fContents);
+		if(packetNum == '0'){
+			newFile = fopen(newFName, "w+");
+			fwrite(fContents+1, 1, numBytes-1, newFile);
+			fclose(newFile);
+			//sendto(sockfd,ack, strlen(ack) +1, 0,(struct sockaddr*)&serveraddr, len);
+		}
+		else{
+			newFile = fopen(newFName, "a");
+			fwrite(fContents+1, 1, numBytes-1, newFile);
+			fclose(newFile);
+			//sendto(sockfd,ack, strlen(ack) +1, 0,(struct sockaddr*)&serveraddr, len);
+		}
+		if(totalPackets == pNum){
+			close(sockfd);
+			return 1;
+		}
 	}
-
-	close(sockfd);
 }
 
 //method to check if a string is an valid ip address 
