@@ -227,3 +227,28 @@ u_short toCksum(char *data, int length) {
                 }
       return checkSum;
 }
+
+//error checking occurs here --------------------------------------------
+
+        //check cs bytes
+        //case 4: if packet corrupt
+        //----> discard packet
+
+        //case 1: if duplicate, discard send ack
+
+        //case 2: no packet made it... server solves see time out
+
+        //case 3: packet out of order (or in order)
+        //store in array 
+        
+
+        //File Writing
+        //if min == array[min].ident (ie the struct ident, not recv ident) {
+            //remember, only do this when the packet is in order (ie min == current packet)
+            //min should reach all elements in a file
+            //send ack
+            //writeto file
+            //remove/clr that element from array
+            //move window
+            //move total packet num (for getting out of loop)
+	//}
