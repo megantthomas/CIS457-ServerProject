@@ -108,10 +108,9 @@ int main(int argc, char **argv){
 		int fsize=ftell(file);
 		rewind(file);
 		int totalPacks = (fsize/packetSize);
-		if(totalPacks == 0){
-		  totalPacks = 1;
+		if((fsize%packetSize) > 0){
+		  totalPacks++;
 		}
-		printf("%d\n", totalPacks);
 		char packetNumMess[2];
 		packetNumMess[0] = (totalPacks +48);
 		packetNumMess[1] = 'p';
