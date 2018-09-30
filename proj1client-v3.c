@@ -134,11 +134,6 @@ int main(int argc, char **argv){
             //reply for packet recieved
             sendto(sockfd, ident, 1+1, 0,(struct sockaddr*)&serveraddr, len);
 	   
-            //reset buffer
-            free(fContents);
-            char* fContents;
-            fContents = (char*)malloc(packetSize*sizeof(char));
-
             //adjust window bounds
 	    if(packetNumMess[0] != max_c){
 	      MIN++;
@@ -147,10 +142,18 @@ int main(int argc, char **argv){
             min_c = (MIN%10) + 48;
             max_c = (MAX%10) + 48;
 	    }
-	  }
+	    
 	  if((packetNumMess[0]-1) <= fContents[0] ){
 	    break;
 	  }
+
+	  //reset buffer
+            free(fContents);
+            char* fContents;
+            fContents = (char*)malloc(packetSize*sizeof(char));
+
+	  }
+
 	  
 	} /*  */
     free(fContents);
