@@ -14,6 +14,12 @@
  * 
  **/
 
+struct packet{
+  char ident;
+  u_short checkSum;
+  char data[1024];
+};
+
 int isValidIpAddress(char *ipAddress);
 
 int main(int argc, char **argv){
@@ -75,7 +81,7 @@ int main(int argc, char **argv){
     	*pos = '\0';
     }
 	sendto(sockfd, fName, strlen(fName)+1, 0,(struct sockaddr*)&serveraddr, len);
-	
+
     //New File Creation
 	printf("New file name: ");
 	char newFName[1000];
@@ -90,42 +96,14 @@ int main(int argc, char **argv){
 
     //Recieving Data-----------------------------------------------
 
-/**
-    //Sliding Window-------------------------------------------------
-    //Window 
-    char min_c = '0';
-    char max_c = '4';
-
-    int MIN = 0;
-    int MAX = 4;
-
-        while (min_c < packetNum < max_c) {
-        //recieve packets TODO
-
-        if (packetNum == min_c) {
-            //send ack TODO
-
-            //adjust window bounds
-            MIN++;
-            MAX++;
-            
-            min_c = (MIN%10) + 48;
-            max_c = (MAX%10) + 48;
-        }
-        //for v2
-        //if duplicate packet (ie below min) 
-        //discard packet and resend ack for recieved packet
-    } 
-    	//notes- save the data you have recieved somewhere, then access it for use
-	//possible store in an array of structs, on server for sure, client maybe
-	//store recieved data in an array
-    //------------------------------------------------------------
-**/   
-
-    //TODO add packet total or no file exists recv
-    //if size 0 OR corrupt, start again
-    //if good proceed
-
+    //number of packets
+    char packetNumMess[2];
+    recvfrom(sockfd, packetNumMess, 2, 0,(struct sockaddr*)&serveraddr, &len);
+    //printf("%c", packetNumMess[0]);
+    //int totalPackets = (packetNumMess[0] + 48);
+	
+   
+    
     //Window 
     char min_c = '0';
     char max_c = '4';
@@ -134,65 +112,50 @@ int main(int argc, char **argv){
 
     int datOS = 1; //data offset for meta data added
     int packetSize = 1024+datOS;
-	int numBytes;
+    int numBytes;
 	//char fContents[10];
     char* fContents;
     char ident[2] = "0a";
     fContents = (char*)malloc(packetSize*sizeof(char));
 	int count = 0;
-	while (1 < (numBytes = recvfrom(sockfd, fContents, packetSize+1, 0,(struct sockaddr*)&serveraddr, &len))) {
-		//printf("%s\n", fContents );
-
-        //error checking occurs here --------------------------------------------
-
-        //check cs bytes
-        //case 4: if packet corrupt
-        //----> discard packet
-
-        //case 1: if duplicate, discard send ack
-
-        //case 2: no packet made it... server solves see time out
-
-        //case 3: packet out of order (or in order)
-        //store in array 
-        
-
-        //File Writing
-        //if min == array[min].ident (ie the struct ident, not recv ident) {
-            //remember, only do this when the packet is in order (ie min == current packet)
-            //min should reach all elements in a file
-            //send ack
-            //writeto file
-            //remove/clr that element from array
-            //move window
-            //move total packet num (for getting out of loop)
-        //}
-
-        if (min_c < fContents[0] < max_c) {
-
+	while (1)
+	  {
+	    numBytes = recvfrom(sockfd, fContents, packetSize+1, 0,(struct sockaddr*)&serveraddr, &len);
+	  printf("packet recieved: %c\n", fContents[0] );
+	  if ((min_c <= fContents[0]) && (fContents[0] <= max_c)) {
+	    
+	    //printf("packet contents: %s\n", fContents );
             newFile = fopen(newFName, "a");
-            //fputs(fContents, newFile);
             fwrite(fContents+datOS, 1, numBytes-datOS, newFile);
             fclose(newFile);
 
             *ident = ((fContents[0]-48)%10)+48;
-            printf("Ack sent: %s\n", ident);
+            printf("Ack sent: %c\n", ident[0]);
             //reply for packet recieved
             sendto(sockfd, ident, 1+1, 0,(struct sockaddr*)&serveraddr, len);
-
-            //reset buffer
-            free(fContents);
-            char* fContents;
-            fContents = (char*)malloc(packetSize*sizeof(char));
-
+	   
             //adjust window bounds
-            MIN++;
+	    if(packetNumMess[0] != max_c){
+	      MIN++;
             MAX++;
 
             min_c = (MIN%10) + 48;
             max_c = (MAX%10) + 48;
-        }
-	}
+	    }
+	    
+	  if((packetNumMess[0]-1) <= fContents[0] ){
+	    break;
+	  }
+
+	  //reset buffer
+            free(fContents);
+            char* fContents;
+            fContents = (char*)malloc(packetSize*sizeof(char));
+
+	  }
+
+	  
+	} /*  */
     free(fContents);
 	close(sockfd);
 }
@@ -205,10 +168,5 @@ int isValidIpAddress(char *ipAddress)
     int result = inet_pton(AF_INET, ipAddress, &(sa.sin_addr));
     return result != 0;
 }
-
-
-
-
-
 
 

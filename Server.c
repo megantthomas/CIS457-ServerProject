@@ -13,6 +13,11 @@
  * PRJ 1-A UDP Echo Server with Sliding Window
  * 
  **/
+struct packet{
+  char ident;
+  u_short cs;
+  char data[1024];
+}
 
 int main(int argc, char **argv){
 	int WINDOW = 5; 
@@ -60,17 +65,13 @@ int main(int argc, char **argv){
 
     /**
     //Sliding Window-------------------------------------------------
-
     //Window 
     char min_c = '0';
     char max_c = '4';
-
     int MIN = 0;
     int MAX = 4;
-
     char[10] ackarr;
     int i = 0;
-
     while  {min_c < packetNum < max_c)
         //send packets TODO
         //recieve acks TODO
@@ -85,7 +86,6 @@ int main(int argc, char **argv){
             
             min_c = (MIN%10) + 48;
             max_c = (MAX%10) + 48;
-
             i++;
         }
         //for v2
@@ -122,7 +122,23 @@ int main(int argc, char **argv){
                 //Not Exists
                 //-----> send file does not exist
                 // ie send back 0 and cs for 0 (ie send 3 bytes: 000)
-
+	    /*
+	    u_short cksum(u_short *buf, int count) { 
+	    register u_long sum = 0;
+	    while (count--)
+	      {
+		sum += *buf++; 
+		     if (sum & 0xFFFF0000)
+		     {
+		//carry occurred, so wrap around 
+		       sum &= 0xFFFF; sum++;
+		     }
+	      } 
+	    return ˜(sum & 0xFFFF);
+	  }
+          */
+	  //file name corruption, ack corruption, sent corruption
+	  //cksum received same as what was sent.
 
                 //prep window
                 //Window 
@@ -202,4 +218,3 @@ int main(int argc, char **argv){
 		}
 	}
 }
-

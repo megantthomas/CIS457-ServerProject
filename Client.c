@@ -15,6 +15,11 @@
  **/
 
 int isValidIpAddress(char *ipAddress);
+struct packet{
+  char ident;
+  u_short cs;
+  char data[1024];
+}
 
 int main(int argc, char **argv){
     //Create Socket
@@ -90,37 +95,7 @@ int main(int argc, char **argv){
 
     //Recieving Data-----------------------------------------------
 
-/**
-    //Sliding Window-------------------------------------------------
-    //Window 
-    char min_c = '0';
-    char max_c = '4';
 
-    int MIN = 0;
-    int MAX = 4;
-
-        while (min_c < packetNum < max_c) {
-        //recieve packets TODO
-
-        if (packetNum == min_c) {
-            //send ack TODO
-
-            //adjust window bounds
-            MIN++;
-            MAX++;
-            
-            min_c = (MIN%10) + 48;
-            max_c = (MAX%10) + 48;
-        }
-        //for v2
-        //if duplicate packet (ie below min) 
-        //discard packet and resend ack for recieved packet
-    } 
-    	//notes- save the data you have recieved somewhere, then access it for use
-	//possible store in an array of structs, on server for sure, client maybe
-	//store recieved data in an array
-    //------------------------------------------------------------
-**/   
 
     //TODO add packet total or no file exists recv
     //if size 0 OR corrupt, start again
@@ -148,7 +123,23 @@ int main(int argc, char **argv){
         //check cs bytes
         //case 4: if packet corrupt
         //----> discard packet
-
+	  /*
+	    u_short cksum(u_short *buf, int count) { 
+	    register u_long sum = 0;
+	    while (count--)
+	      {
+		sum += *buf++; 
+		     if (sum & 0xFFFF0000)
+		     {
+		//carry occurred, so wrap around 
+		       sum &= 0xFFFF; sum++;
+		     }
+	      } 
+	    return ˜(sum & 0xFFFF);
+	  }
+          */
+	  //if sent is correct save to file.
+	
         //case 1: if duplicate, discard send ack
 
         //case 2: no packet made it... server solves see time out
@@ -205,10 +196,3 @@ int isValidIpAddress(char *ipAddress)
     int result = inet_pton(AF_INET, ipAddress, &(sa.sin_addr));
     return result != 0;
 }
-
-
-
-
-
-
-
